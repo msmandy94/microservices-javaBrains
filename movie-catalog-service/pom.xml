@@ -55,6 +55,23 @@
             <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
         </dependency>
 
+        <!--adding dependencies for hystrix dashboard for this single application
+            there are 3 steps to enable hystrix dashboard.
+            https://www.youtube.com/watch?v=WfsomLHaSzQ&list=PLqq-6Pq4lTTbXZY_elyGv7IkKrfkSrX5e&index=21
+            1. add these dependencies
+            2. @EnableHystrixDashboard
+            3. management.endpoints.web.exposure.include=hystrix.stream-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-hystrix-dashboard</artifactId>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-actuator -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
     </dependencies>
 
     <!--i had to add this to make spring-cloud-starter-netflix-eureka-client work, otherwise it doesn't compile-->
