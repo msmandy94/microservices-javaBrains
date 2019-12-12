@@ -6,7 +6,10 @@ import com.example.moviecatalogservice.model.external.Rating;
 import com.example.moviecatalogservice.model.external.UserRatings;
 import com.example.moviecatalogservice.service.MovieInfoService;
 import com.example.moviecatalogservice.service.UserRatingService;
+import com.example.moviecatalogservice.test.CommandHelloWorld;
 import com.google.common.collect.Lists;
+import com.netflix.hystrix.HystrixCircuitBreaker;
+import com.netflix.hystrix.HystrixCommandKey;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import com.netflix.hystrix.strategy.properties.HystrixProperty;
 import com.netflix.ribbon.proxy.annotation.Hystrix;
@@ -24,6 +27,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
+import rx.Observable;
+import rx.Observer;
 
 import javax.xml.ws.ResponseWrapper;
 import java.util.Arrays;
@@ -55,8 +60,35 @@ public class MovieCatalogResource {
         // UserRatings userRatings = restTemplate.getForObject("http://localhost:8083/ratingsdata/user/" + userId, UserRatings.class);
         // the below aproach is with Eureka
         // first solution: without hystrix >> UserRatings userRatings = restTemplate.getForObject("http://rating-data-service/ratingsdata/user/" + userId, UserRatings.class);
+        UserRatings userRatings = null;
+        try {
+            userRatings = userRatingService.getUserRatings(userId);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        HystrixCircuitBreaker getUserRatings = HystrixCircuitBreaker.Factory.getInstance(HystrixCommandKey.Factory.asKey("getUserRatings"));
+        System.out.println(getUserRatings.isOpen());
+/*        CommandHelloWorld command = new CommandHelloWorld("someName");
+        Observable<String> observe = command.observe();
+        observe.subscribe(new Observer<String>() {
+            @Override
+            public void onCompleted() {
 
-        UserRatings userRatings = userRatingService.getUserRatings(userId);
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+
+            }
+
+            @Override
+            public void onNext(String s) {
+
+            }
+        });
+        command.execute();*/
+        //HystrixCircuitBreaker acommand = HystrixCircuitBreaker.Factory.getInstance(HystrixCommandKey.Factory.asKey("command name"));
+        //acommand.isOpen();
         /* to deal with List Response from services
         ResponseEntity<List<Rating>> exchange = restTemplate.exchange("http://localhost:8083/ratingsdata/user/" + userId, HttpMethod.POST, HttpEntity.EMPTY,
                 new ParameterizedTypeReference<List<Rating>>() {

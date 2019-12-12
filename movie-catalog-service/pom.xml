@@ -61,12 +61,16 @@
             1. add these dependencies
             2. @EnableHystrixDashboard
             3. management.endpoints.web.exposure.include=hystrix.stream-->
+
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-hystrix-dashboard</artifactId>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-actuator -->
+        <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-actuator
+            for hystrix.stream go to http://localhost:8084/actuator/hystrix.stream
+            the hystrix dependency is not mandatory for this stream. nether @EnableHystrixDashboard
+            -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>

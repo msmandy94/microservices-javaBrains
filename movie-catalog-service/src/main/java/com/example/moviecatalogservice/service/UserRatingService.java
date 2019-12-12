@@ -2,6 +2,8 @@ package com.example.moviecatalogservice.service;
 
 import com.example.moviecatalogservice.model.external.Rating;
 import com.example.moviecatalogservice.model.external.UserRatings;
+import com.netflix.hystrix.HystrixCircuitBreaker;
+import com.netflix.hystrix.HystrixCommandKey;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,10 +30,21 @@ public class UserRatingService {
             }
     )
     public UserRatings getUserRatings(String userId) {
-        return restTemplate.getForObject("http://rating-data-service/ratingsdata/user/" + userId, UserRatings.class);
+        throw new RuntimeException("exception in original");
+        //return restTemplate.getForObject("http://rating-data-service/ratingsdata/user/" + userId, UserRatings.class);
     }
 
     private UserRatings getUserRatingsFallback(String userId) {
-        return new UserRatings(userId, Arrays.asList(new Rating("100", 0)));
+        System.out.println("on fallback");
+        if (isCircuitOpen("getUserRatings")){
+            System.out.println("circuit is open");
+            throw new RuntimeException("circuit is open enjou ");
+        }
+        System.out.println("circuit is closed");
+        throw new RuntimeException("circuit is closed");
+        //return new UserRatings(userId, Arrays.asList(new Rating("100", 0)));
+    }
+    private static boolean isCircuitOpen(String commandName){
+        return HystrixCircuitBreaker.Factory.getInstance(HystrixCommandKey.Factory.asKey(commandName)).isOpen();
     }
 }
